@@ -48,14 +48,14 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => { // whatever is returned will be shortURL now
   //console.log(req.params, " before shortUrl");
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
 app.post("/urls/:shortURL/", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  urlDatabase[req.params.shortURL] = req.body.longURL; // for post the body will be the data from the form _shows
   //console.log(urlDatabase)
 });
 

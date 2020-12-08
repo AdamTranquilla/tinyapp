@@ -17,11 +17,7 @@ function generateRandomString() {
 }
 
 app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  res.send("Home Page!"); // send just sends data aka arrays, obj etc, usually a json
 });
 
 app.get("/urls", (req, res) => {
@@ -35,6 +31,7 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
+  console.log(req.body)
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);
@@ -52,9 +49,14 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  console.log(req.params, " before shortUrl");
+  //console.log(req.params, " before shortUrl");
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+});
+
+app.post("/urls/:shortURL/", (req, res) => {
+  urlDatabase[req.params.shortURL] = req.body.longURL;
+  //console.log(urlDatabase)
 });
 
 app.listen(PORT, () => {

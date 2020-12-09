@@ -1,11 +1,13 @@
 const express = require("express");
+var cookieParser = require('cookie-parser');
 const app = express();
 const PORT = 8080; // default port 8080
 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(cookieParser())
 app.set("view engine", "ejs");
+
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -17,21 +19,39 @@ function generateRandomString() {
 }
 
 app.get("/", (req, res) => {
-  res.send("Home Page!"); // send just sends data aka arrays, obj etc, usually a json
+  const username = req.cookies["username"]
+  const urls = urlDatabase
+  const templateVars = { urls, username };
+  res.render("urls_index", templateVars);
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase }; // must be an object. this is so it can be accessed by key
+  const username = req.cookies["username"]
+  const urls = urlDatabase
+  const templateVars = { urls, username }; // must be an object. this is so it can be accessed by key
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const username = req.cookies["username"]
+  const templateVars = { username }
+  res.render("urls_new", templateVars);
+});
+
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  res.redirect('/');
+});
+
+app.post("/logout", (req, res) => {
+  res.clearCookie("username");
+  res.redirect('/urls');
 });
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  console.log(req.body)
+  console.log(req.body);
   const longURL = req.body.longURL;
   urlDatabase[shortURL] = longURL;
   res.redirect(`/urls/${shortURL}`);

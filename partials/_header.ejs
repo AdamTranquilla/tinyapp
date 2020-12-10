@@ -9,13 +9,12 @@
       <div class="navbar-nav ml-auto">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Registration</a>
-
       </div>
       <%if (!userId) { %>
         <a class="nav-item nav-link" href="/login">Login</a>
+        <a class="nav-item nav-link" href="/register">Registration</a>
         <% } else { %>
-      <p><%= userId %></p>
+      <span>Logged in as: <%= userId.email %>&nbsp</span>
       <form method="POST" action="/logout" class="d-flex">
         <button class="btn btn-secondary" type="submit">Logout</button>
       </form>

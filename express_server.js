@@ -83,7 +83,7 @@ app.post("/register", (req, res) => {
   }
   const user = { id, email, password };
   users[id] = user;
-  console.log(users)
+  //console.log(users)
   res.cookie("userId", id);
   res.redirect('/');
 });
@@ -93,16 +93,18 @@ app.post("/login", (req, res) => {
   const password = req.body.password;
 
   const user = emailLookup(email)
-
+  console.log(users)
   if (!user) {
     res.status(403).send('A user with that e-mail cannot be found');
   }
-  console.log(users[user].password)
-  if (password === users[user].password) {
+  console.log(typeof users[user].password)
+  console.log(typeof password)
+  if (password !== users[user].password) {
     res.status(400).send('Incorrect password');
   }
 
-  //res.cookie("userId", user); //user?
+  res.cookie("userId", users[user]);
+  console.log(user)
   res.redirect('/');
 });
 

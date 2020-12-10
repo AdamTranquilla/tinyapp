@@ -10,13 +10,10 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
         <a class="nav-item nav-link" href="/register">Registration</a>
+
       </div>
       <%if (!userId) { %>
-        <form method="POST" action="/login">
-          <input class="form-control d-inline" type="text" name="userId" placeholder="userId"
-            style="width: 300px; margin: 1em">
-          <button class="btn btn-outline-secondary" type="submit">Login</button>
-        </form>
+        <a class="nav-item nav-link" href="/login">Login</a>
         <% } else { %>
       <p><%= userId %></p>
       <form method="POST" action="/logout" class="d-flex">

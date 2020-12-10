@@ -11,7 +11,7 @@ app.set("view engine", "ejs");
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userId: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userId: "userRandomID" }
+  i3BoGr: { longURL: "https://www.google.ca", userId: "testId" }
 };
 
 const users = {
@@ -20,10 +20,10 @@ const users = {
     email: "user@example.com",
     password: "purple-monkey-dinosaur"
   },
-  "user2RandomID": {
-    id: "user2RandomID",
-    email: "user2@example.com",
-    password: "dishwasher-funk" // use bcrypt
+  "testId": {
+    id: "testId",
+    email: "test@1.com",
+    password: "abc" // use bcrypt
   }
 };
 
@@ -37,10 +37,11 @@ function emailLookup(email) {
   }
 }
 
-function usersURLs(userId) {
+function usersURLs(user) {
   const filteredURLs = {};
+  console.log(user.id)
   for (const url in urlDatabase) {
-    if (urlDatabase[url].userId === userId) {
+    if (urlDatabase[url].userId === user.id) {
       filteredURLs[url] = urlDatabase[url];
     }
   }
@@ -56,7 +57,7 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   if (!req.cookies["userId"]) res.redirect("/login");
-
+//console.log(req.cookies["userId"])
   const templateVars = {
     urls: usersURLs(req.cookies["userId"]),
     userId: req.cookies["userId"]
@@ -150,11 +151,10 @@ app.post("/logout", (req, res) => {
 
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  const longURL = req.body.longURL;
 
   urlDatabase[shortURL] = {
     longURL: req.body.longURL,
-    userId: req.cookies["userId"]
+    userId: req.cookies["userId"].id
   };
 
   res.redirect(`/urls/${shortURL}`);

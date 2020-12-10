@@ -10,8 +10,8 @@ app.set("view engine", "ejs");
 
 
 const urlDatabase = {
-  b6UTxQ: { longURL: "https://www.tsn.ca", userID: "aJ48lW" },
-  i3BoGr: { longURL: "https://www.google.ca", userID: "aJ48lW" }
+  b6UTxQ: { longURL: "https://www.tsn.ca", userId: "aJ48lW" },
+  i3BoGr: { longURL: "https://www.google.ca", userId: "userRandomID" }
 };
 
 const users = {
@@ -37,6 +37,16 @@ function emailLookup(email) {
   }
 }
 
+function usersURLs(userId) {
+  const filteredURLs = {};
+  for (const url in urlDatabase) {
+    if (urlDatabase[url].userId === userId) {
+      filteredURLs[url] = urlDatabase[url];
+    }
+  }
+  return filteredURLs;
+}
+//update this to homepage
 app.get("/", (req, res) => {
   const userId = req.cookies["userId"];
   const urls = urlDatabase;
@@ -45,16 +55,40 @@ app.get("/", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const userId = req.cookies["userId"];
-  const urls = urlDatabase;
-  const templateVars = { urls, userId }; // must be an object. this is so it can be accessed by key
+  if (!req.cookies["userId"]) res.redirect("/login");
+
+  const templateVars = {
+    urls: usersURLs(req.cookies["userId"]),
+    userId: req.cookies["userId"]
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  const userId = req.cookies["userId"];
-  const templateVars = { userId };
+  if (!req.cookies["userId"]) res.redirect("/login");
+
+  const templateVars = {
+    userId: req.cookies["userId"]
+  };
   res.render("urls_new", templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL].longURL;
+
+  res.redirect(longURL);
+});
+
+app.get("/urls/:shortURL", (req, res) => {
+  if (!req.cookies["userId"]) res.redirect("/login");
+
+  const templateVars = {
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[req.params.shortURL].longURL,
+    userId: req.cookies["userId"]
+  };
+  res.render("urls_show", templateVars);
 });
 
 app.get("/register", (req, res) => {
@@ -71,7 +105,6 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  const id = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
 
@@ -81,31 +114,33 @@ app.post("/register", (req, res) => {
   if (email === '' || password === '') {
     res.status(400).send('One or more fields are empty');
   }
-  const user = { id, email, password };
+
+  const id = generateRandomString();
+  const user = {
+    id: generateRandomString(),
+    email: req.body.email,
+    password: req.body.password,
+  };
   users[id] = user;
   //console.log(users)
   res.cookie("userId", id);
-  res.redirect('/');
+  res.redirect('/urls');
 });
 
 app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
+  const user = emailLookup(email);
 
-  const user = emailLookup(email)
-  console.log(users)
   if (!user) {
     res.status(403).send('A user with that e-mail cannot be found');
   }
-  console.log(typeof users[user].password)
-  console.log(typeof password)
   if (password !== users[user].password) {
     res.status(400).send('Incorrect password');
   }
 
   res.cookie("userId", users[user]);
-  console.log(user)
-  res.redirect('/');
+  res.redirect('/urls');
 });
 
 app.post("/logout", (req, res) => {
@@ -117,21 +152,12 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   const longURL = req.body.longURL;
 
-  urlDatabase[shortURL] = longURL;
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userId: req.cookies["userId"]
+  };
 
   res.redirect(`/urls/${shortURL}`);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-  const shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
-
-  res.redirect(longURL);
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  const templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => { // whatever is returned will be shortURL now

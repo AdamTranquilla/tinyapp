@@ -23,7 +23,7 @@ const users = {
   "user2RandomID": {
     id: "user2RandomID",
     email: "user2@example.com",
-    password: "dishwasher-funk"
+    password: "dishwasher-funk" // use bcrypt
   }
 };
 
@@ -119,7 +119,7 @@ app.post("/register", (req, res) => {
   const user = {
     id: generateRandomString(),
     email: req.body.email,
-    password: req.body.password,
+    password: req.body.password, // use bcrypt
   };
   users[id] = user;
   //console.log(users)
@@ -135,7 +135,7 @@ app.post("/login", (req, res) => {
   if (!user) {
     res.status(403).send('A user with that e-mail cannot be found');
   }
-  if (password !== users[user].password) {
+  if (password !== users[user].password) { // use bycrypt
     res.status(400).send('Incorrect password');
   }
 

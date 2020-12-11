@@ -39,10 +39,10 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userId = req.session.userId;
   verifyLoggedIn(userId, res);
-  
+
   const user = users[userId];
   const urls = usersURLs(userId, urlDb);
-  
+
   const templateVars = { urls, user };
 
   res.render("urls_index", templateVars);
@@ -75,7 +75,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const matchResult = urlDb[shortURL];
 
   if (!matchResult) {
-    return res.send("No Url Found");
+    return res.status(404).send("No Url Found");
   }
 
   const user = users[userId];
@@ -85,7 +85,7 @@ app.get("/urls/:shortURL", (req, res) => {
     const templateVars = { user, shortURL, longURL };
     return res.render("urls_show", templateVars);
   }
-  res.send("You do not have permission to do this"); //turn into template
+  res.status(403).send("You do not have permission to do this"); //turn into template
 });
 
 app.get("/register", (req, res) => {
@@ -111,10 +111,11 @@ app.post("/register", (req, res) => {
   const password = req.body.password;
 
   if (getUserByEmail(email, users)) {
-    res.status(400).send('User already exists');
+    return res.status(400).send('User already exists');
+
   }
   if (email === '' || password === '') {
-    res.status(400).send('One or more fields are empty');
+    return res.status(400).send('One or more fields are empty');
   }
   const userId = generateRandomString();
 
@@ -135,8 +136,8 @@ app.post("/login", (req, res) => {
   const user = getUserByEmail(email, users);
 
   if (!user) {
-    res.status(403).send('A user with that e-mail cannot be found');
-    return;
+    return res.status(403).send('A user with that e-mail cannot be found');
+
   }
 
   const userId = user.id;
@@ -145,7 +146,8 @@ app.post("/login", (req, res) => {
   const hash = user.password;
 
   if (!bcrypt.compareSync(password, hash)) {
-    res.status(400).send('Incorrect password');
+    return res.status(400).send('Incorrect password');
+
   }
 
   req.session.userId = userId;
@@ -154,7 +156,7 @@ app.post("/login", (req, res) => {
 
 app.post("/logout", (req, res) => {
   req.session = null;
-  res.redirect('/urls');
+  res.redirect('/login'); // sends user back to login page
 });
 
 app.post("/urls", (req, res) => {

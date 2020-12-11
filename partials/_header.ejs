@@ -10,11 +10,11 @@
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
-      <%if (!userId) { %>
+      <%if (!user) { %>
         <a class="nav-item nav-link" href="/login">Login</a>
         <a class="nav-item nav-link" href="/register">Registration</a>
         <% } else { %>
-      <span>Logged in as: <%= userId.email %>&nbsp</span>
+      <span>Logged in as: <%= user.email %>&nbsp</span>
       <form method="POST" action="/logout" class="d-flex">
         <button class="btn btn-secondary" type="submit">Logout</button>
       </form>

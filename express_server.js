@@ -2,7 +2,8 @@ const express = require("express");
 const bcrypt = require('bcrypt');
 const bodyParser = require("body-parser");
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require('./helper.js');
+const { generateRandomString, getUserByEmail, usersURLs, verifyLoggedIn } = require('./helper.js');
+
 const app = express();
 const PORT = 8080;
 
@@ -28,27 +29,6 @@ const users = {
   }
 };
 
-function generateRandomString() {
-  return Math.floor((1 + Math.random()) * 0x1000000).toString(16).substring(1);
-}
-
-function usersURLs(id) {
-  let filteredURLs = {};
-  for (const url in urlDb) {
-    if (urlDb[url].userId === id) {
-      filteredURLs[url] = urlDb[url];
-    }
-  }
-  return filteredURLs;
-}
-
-function verifyLoggedIn(userId, res) {
-  if (!userId) {
-    res.redirect('/login');
-    return;
-  }
-};
-
 app.get("/", (req, res) => {
   const userId = req.session.userId;
   verifyLoggedIn(userId, res);
@@ -59,10 +39,10 @@ app.get("/", (req, res) => {
 app.get("/urls", (req, res) => {
   const userId = req.session.userId;
   verifyLoggedIn(userId, res);
-
+  
   const user = users[userId];
-  const urls = usersURLs(userId);
-
+  const urls = usersURLs(userId, urlDb);
+  
   const templateVars = { urls, user };
 
   res.render("urls_index", templateVars);
@@ -187,19 +167,19 @@ app.post("/urls", (req, res) => {
   res.redirect(`/urls`);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDb[req.params.shortURL];
-  res.redirect("/urls");
-});
-
 app.post("/urls/:shortURL", (req, res) => {
   const longURL = req.body.longURL;
-  
+
   urlDb[req.params.shortURL].longURL = longURL;
 
   res.redirect("/urls");
 });
 
+app.post("/urls/:shortURL/delete", (req, res) => { // deleting short url from URL Database
+  delete urlDb[req.params.shortURL];
+  res.redirect("/urls");
+});
+
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`TinyApp listening on port ${PORT}!`);
 });

@@ -6,6 +6,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 -Users are able to populate their own list of private tiny URLs which can be shared to other, but not edited by them.
 -URLs can be updated or deleted
+-Total URL visits and unique visits are tracked and counted
 
 ## Final Product
 
@@ -21,6 +22,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 - bcrypt
 - body-parser
 - cookie-session
+- method-override
 
 ## Getting Started
 

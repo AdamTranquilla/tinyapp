@@ -20,6 +20,8 @@
         <tr>
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Page Visits</th>
+          <th scope="col">Unique Visits</th>
           <th scope="col">Update</th>
           <th scope="col">Delete</th>
         </tr>
@@ -27,16 +29,18 @@
       <tbody>
         <tr>
           <td><a href="/u/<%= shortURL %>"><%= shortURL %></a></td>
-          <form method="POST" action="/urls/<%= shortURL %>">
+          <form method="POST" action="/urls/<%= shortURL %>?_method=PUT">
           <td>
             <input class="form-control" type="text" name="longURL" placeholder="Enter new URL" style="width: 300px">
           </td>
+          <td><%= visitsData.totalVisits %></td>
+          <td><%= visitsData.uniqueVisits.length %></td>
           <td>
               <button type="submit" class="btn btn-primary">Update</button>
             </td>
           </form>
           <td>
-            <form method="POST" action="/urls/<%= shortURL %>/delete">
+            <form method="POST" action="/urls/<%= shortURL %>?_method=DELETE">
               <button type="delete" class="btn btn-danger">Delete</button>
             </form>
           </td>

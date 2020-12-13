@@ -20,10 +20,12 @@ function usersURLs(id, urlDb) {
   return filteredURLs;
 }
 
-function verifyLoggedIn(userId, res) {
+function verifyLoggedIn(userId) {
   if (!userId) {
-    res.redirect('/login');
-    return;
+    return false;
+  }
+  if (userId) {
+    return true;
   }
 };
 
